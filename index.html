@@ -675,39 +675,88 @@ codex -m gpt-5.4-mini -c model_reasoning_effort=low "Summarize the API surface o
           <details class="guide-card span-7">
             <summary>
               <span class="num">08</span>
-              <div class="summary-text"><h3>A usable AGENTS.md template</h3><p>Codex does not need prose. It needs operating constraints.</p></div>
+              <div class="summary-text"><h3>A production-grade AGENTS.md template</h3><p>Distilled from 2,500+ real AGENTS.md files surveyed by GitHub.</p></div>
               <span class="plus">+</span>
             </summary>
             <div class="details-body">
+              <p class="muted">Generic Next.js + TypeScript + Postgres example — adapt the stack to yours, keep the structure. Note the three-tier <strong>Boundaries</strong> section (Ask first / Never) and the <strong>When Stuck</strong> escape hatch — both are common in well-run repos and rare in beginner templates.</p>
               <pre><code># AGENTS.md
 
-## Project map
-- Web app: `apps/web` (Next.js, App Router)
-- API: `apps/api` (FastAPI)
-- Shared types: `packages/contracts`
+## Project Overview
+Customer-facing storefront. Next.js 15 (App Router) + TypeScript 5.4 +
+Postgres 16 (Prisma) + Tailwind 3. Deployed to Vercel; staging on push to
+`main`, prod on git tag `v*`. Business logic lives in `src/server/` — UI
+components are dumb.
 
 ## Setup
-- Install: `pnpm install`
-- Dev server: `pnpm dev`
-- Typecheck: `pnpm typecheck`
-- Test all: `pnpm test`
-- Test web: `pnpm --filter web test`
+- Node 20.x (`.nvmrc`), pnpm 9.x — never npm or yarn (lockfile is pnpm).
+- `cp .env.example .env.local`, then load secrets from your secret manager
+  (1Password CLI, Vault, etc.). Never paste real values into files.
+- `pnpm install`
+- `pnpm db:up` (starts Postgres in Docker), `pnpm db:migrate`, `pnpm db:seed`
 
-## Coding rules
-- Do not introduce new runtime dependencies without explaining why.
-- Prefer small functions and explicit domain names over generic helpers.
-- Keep public API compatibility unless the task asks for a breaking change.
-- Never remove error handling to make tests pass.
+## Common Commands
+- Dev server: `pnpm dev` (http://localhost:3000)
+- Type-check: `pnpm typecheck`
+- Lint: `pnpm lint` · Format: `pnpm format`
+- Unit tests: `pnpm test` (Vitest) — single file: `pnpm test src/lib/cart.test.ts`
+- E2E tests: `pnpm e2e` (Playwright; requires `pnpm dev` running)
+- New migration: `pnpm db:migrate:new &lt;name&gt;` — never edit existing migrations
 
-## Validation
-Before reporting done, run the narrowest relevant check. If a check cannot run,
-state the exact command attempted and the reason.
+## Repository Structure
+- `src/app/` — App Router pages and route handlers (thin; delegate to `server/`)
+- `src/components/` — presentational React components, no data fetching
+- `src/server/` — business logic, db access (Prisma), external API clients
+- `src/server/actions/` — server actions, all input-validated with Zod
+- `src/lib/` — pure utilities, no I/O
+- `prisma/` — schema + migrations (one migration per PR, max)
+- `e2e/` — Playwright specs
+- `.github/workflows/` — CI; mirror locally with `pnpm ci`
 
-## Git and review
-- Do not commit unless explicitly asked.
-- Summarize touched files and risk areas.
-- For non-trivial changes, run a review pass on the diff.</code></pre>
-              <div class="callout warn"><strong>Do not stuff everything here:</strong> detailed procedures belong in skills; temporary task context belongs in the prompt; secret values belong nowhere near agent-readable instructions.</div>
+## Code Style
+- Strict TS, no `any`, no non-null `!`. Prefer `unknown` + narrowing.
+- Server-only modules: `import "server-only"` at top.
+- Components: function declarations, props interface above the component.
+- Database access only inside `src/server/`. UI never touches Prisma directly.
+- Errors: throw `AppError` (see `src/lib/errors.ts`), never bare `Error`.
+- Real example to mirror: `src/server/cart/add-item.ts`.
+
+## Testing
+- Unit tests next to source: `foo.ts` → `foo.test.ts`. Mock with `vi.mock`.
+- Server actions need a Vitest test + a Playwright happy-path.
+- New API route → add a test in `src/app/api/**/route.test.ts`.
+- Don't add snapshot tests for components.
+
+## Pull Requests
+- Branches: `feat/`, `fix/`, `chore/`, `docs/` prefixes off `main`.
+- Conventional commits (`feat(cart): ...`). One logical change per PR.
+- PR body: what changed, why, screenshots for UI, migration notes if schema changed.
+- CI must be green. Before pushing: `pnpm typecheck && pnpm lint && pnpm test`.
+- Never force-push shared branches. Rebase, don't merge `main` in.
+
+## Boundaries
+
+**Ask first**
+- Adding a new dependency (check `pnpm why` first; prefer existing).
+- Schema changes that touch `users`, `orders`, `payments`.
+- Anything that changes the public API contract in `src/app/api/`.
+- Bumping framework majors (Next, React, Prisma).
+
+**Never**
+- Commit `.env*`, secrets, or values from your secret manager.
+- Edit existing Prisma migrations — write a new one.
+- Disable type-check, lint, or tests in CI to ship.
+- Use `dangerouslySetInnerHTML` without a sanitizer + a comment explaining why.
+- `git push --force` on `main` or release branches.
+
+## When Stuck
+- Build/test passes locally but fails in CI: check Node version, then `.env.example` drift.
+- Prisma type errors after pulling: `pnpm db:generate`.
+- Auth/session weirdness: see `src/server/auth/README.md`.
+- Anything else: stop and summarize what you tried in the PR description.</code></pre>
+              <div class="callout"><strong>Rules of thumb from real templates:</strong> front-load exact commands (agents grep for them early); use the three-tier boundary section — the "Never" list stops the most expensive mistakes; specifics beat prose ("React 18 + TS 5.4" not "a modern React project"); give rules <em>with rationale</em>, not just rules; treat AGENTS.md as public — point at where secrets live, never the secrets themselves.</div>
+              <div class="callout warn"><strong>Do not stuff everything here:</strong> detailed procedures belong in skills; temporary task context belongs in the prompt. Aim for under ~150 lines per repo; nest sub-AGENTS.md per package for larger codebases (the closest one wins).</div>
+              <p class="small">Deeper reference: <a href="https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/" target="_blank">"How to write a great AGENTS.md" (GitHub Blog, 2,500+ repo study)</a>. Real production examples worth reading: <a href="https://github.com/apache/airflow/blob/main/AGENTS.md" target="_blank">Apache Airflow</a> (the gold standard), <a href="https://github.com/openai/codex/blob/main/AGENTS.md" target="_blank">OpenAI Codex</a>, <a href="https://github.com/temporalio/sdk-java/blob/master/AGENTS.md" target="_blank">Temporal Java SDK</a>. Curated lists: <a href="https://github.com/Ischca/awesome-agents-md" target="_blank">Ischca/awesome-agents-md</a>, <a href="https://github.com/tairov/awesome-agents.md" target="_blank">tairov/awesome-agents.md</a>.</p>
             </div>
           </details>
 
