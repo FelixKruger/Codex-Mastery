@@ -1,0 +1,1675 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Codex Mastery — Complete Field Guide</title>
+  <meta name="description" content="A deeply researched field guide to OpenAI Codex: CLI, app, cloud, AGENTS.md, config, sandboxing, skills, MCP, subagents, workflows, and troubleshooting." />
+  <style>
+    :root {
+      --bg: #080b12;
+      --panel: #0f1523;
+      --panel-2: #121a2b;
+      --panel-3: #182235;
+      --text: #e8eefc;
+      --muted: #9aa9c7;
+      --subtle: #6e7c99;
+      --line: rgba(148, 163, 184, .18);
+      --line-strong: rgba(148, 163, 184, .34);
+      --accent: #63d5ff;
+      --accent-2: #9d7dff;
+      --accent-3: #51e8ad;
+      --warning: #ffd166;
+      --danger: #ff6b87;
+      --ok: #70f0b9;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .42);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(99, 213, 255, .14), transparent 32rem),
+        radial-gradient(circle at 72% 10%, rgba(157, 125, 255, .14), transparent 32rem),
+        radial-gradient(circle at 45% 100%, rgba(81, 232, 173, .08), transparent 34rem),
+        var(--bg);
+      line-height: 1.55;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, pre, kbd { font-family: var(--mono); }
+    kbd {
+      border: 1px solid var(--line-strong);
+      background: rgba(255, 255, 255, .06);
+      border-bottom-color: rgba(255, 255, 255, .35);
+      border-radius: 6px;
+      padding: 0 .35rem;
+      color: #fff;
+      font-size: .82em;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 24px 18px;
+      border-right: 1px solid var(--line);
+      background: rgba(8, 11, 18, .78);
+      backdrop-filter: blur(18px);
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 36px rgba(99, 213, 255, .3);
+    }
+    .brand small { display: block; color: var(--muted); font-weight: 600; font-size: .72rem; }
+
+    .nav-section {
+      margin: 18px 0 8px;
+      color: var(--subtle);
+      text-transform: uppercase;
+      font-size: .72rem;
+      letter-spacing: .12em;
+      font-weight: 800;
+    }
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: .92rem;
+    }
+    nav a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .055);
+      text-decoration: none;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 99px;
+      background: var(--line-strong);
+      flex: 0 0 auto;
+    }
+
+    .side-note {
+      margin-top: 22px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .04);
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    main {
+      max-width: 1240px;
+      width: 100%;
+      padding: 48px 44px 80px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(99, 213, 255, .12), rgba(157, 125, 255, .08) 42%, rgba(255, 255, 255, .03)),
+        rgba(15, 21, 35, .82);
+      border-radius: 28px;
+      padding: 46px;
+      box-shadow: var(--shadow);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -120px auto;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 213, 255, .24), transparent 66%);
+      pointer-events: none;
+    }
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(99, 213, 255, .35);
+      color: #c7f2ff;
+      background: rgba(99, 213, 255, .08);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(3.1rem, 8vw, 7.2rem);
+      line-height: .88;
+      letter-spacing: -.08em;
+    }
+    .hero p.lead {
+      max-width: 940px;
+      color: #c9d6f0;
+      font-size: clamp(1.08rem, 2vw, 1.35rem);
+      margin: 0 0 26px;
+    }
+    .pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 11px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .035);
+      font-size: .86rem;
+      white-space: nowrap;
+    }
+    .pill strong { color: #fff; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto auto;
+      gap: 10px;
+      margin: 22px 0;
+      align-items: center;
+    }
+    .search {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(8, 11, 18, .58);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px 14px;
+      outline: none;
+      font-size: 1rem;
+    }
+    .search:focus { border-color: rgba(99, 213, 255, .55); box-shadow: 0 0 0 3px rgba(99, 213, 255, .1); }
+    button {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .055);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 700;
+    }
+    button:hover { background: rgba(255, 255, 255, .095); }
+
+    .section {
+      margin-top: 34px;
+      scroll-margin-top: 24px;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: end;
+      margin: 34px 0 14px;
+    }
+    .section h2 {
+      font-size: clamp(1.7rem, 4vw, 2.7rem);
+      margin: 0;
+      letter-spacing: -.045em;
+    }
+    .section-head p {
+      max-width: 620px;
+      margin: 0;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-7 { grid-column: span 7; }
+    .span-6 { grid-column: span 6; }
+    .span-5 { grid-column: span 5; }
+    .span-4 { grid-column: span 4; }
+    .span-3 { grid-column: span 3; }
+
+    .card,
+    details.guide-card {
+      border: 1px solid var(--line);
+      background: rgba(15, 21, 35, .74);
+      border-radius: var(--radius);
+      box-shadow: 0 14px 50px rgba(0, 0, 0, .22);
+    }
+    .card { padding: 18px; }
+    .card h3, details summary h3 {
+      margin: 0 0 8px;
+      font-size: 1.12rem;
+      letter-spacing: -.02em;
+    }
+    .card p { margin: 0 0 12px; color: var(--muted); }
+    .card p:last-child { margin-bottom: 0; }
+
+    details.guide-card { overflow: clip; }
+    details.guide-card > summary {
+      list-style: none;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 18px;
+      cursor: pointer;
+    }
+    details.guide-card > summary::-webkit-details-marker { display: none; }
+    .num {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(99, 213, 255, .34);
+      border-radius: 12px;
+      color: var(--accent);
+      font-weight: 900;
+      font-size: .88rem;
+      background: rgba(99, 213, 255, .07);
+    }
+    .summary-text p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+    .plus {
+      width: 32px;
+      height: 32px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: #d7e7ff;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .04);
+      transition: transform .18s ease;
+      font-weight: 900;
+    }
+    details[open] .plus { transform: rotate(45deg); }
+    .details-body {
+      border-top: 1px solid var(--line);
+      padding: 18px;
+      background: rgba(0, 0, 0, .12);
+    }
+
+    .callout {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border-radius: 15px;
+      border: 1px solid rgba(99, 213, 255, .24);
+      background: rgba(99, 213, 255, .07);
+      color: #d7f5ff;
+    }
+    .callout strong { color: #fff; }
+    .callout.warn { border-color: rgba(255, 209, 102, .35); background: rgba(255, 209, 102, .08); color: #ffe7a6; }
+    .callout.danger { border-color: rgba(255, 107, 135, .35); background: rgba(255, 107, 135, .08); color: #ffd0d9; }
+    .callout.ok { border-color: rgba(112, 240, 185, .32); background: rgba(112, 240, 185, .07); color: #c7ffe6; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+      margin: 14px 0;
+      border: 1px solid var(--line);
+      font-size: .92rem;
+    }
+    th, td {
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      color: #dfe9ff;
+      text-align: left;
+      background: rgba(255, 255, 255, .055);
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    td { color: #c5d1ea; }
+    tr:last-child td { border-bottom: none; }
+
+    pre {
+      margin: 14px 0;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 15px;
+      background: rgba(3, 6, 13, .74);
+      overflow-x: auto;
+      color: #d9e7ff;
+      font-size: .86rem;
+      line-height: 1.55;
+    }
+    .token-comment { color: #7f8aa6; }
+    .small { font-size: .88rem; color: var(--muted); }
+    .muted { color: var(--muted); }
+    .tight-list { margin: 10px 0 14px; padding-left: 1.1rem; color: #c5d1ea; }
+    .tight-list li { margin: 5px 0; }
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .mini-card {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .035);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .mini-card h4 { margin: 0 0 8px; font-size: .98rem; }
+    .mini-card p { margin: 0; color: var(--muted); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .flow-step {
+      padding: 13px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .035);
+      min-height: 118px;
+    }
+    .flow-step b { display: block; color: #fff; margin-bottom: 6px; }
+    .flow-step span { color: var(--muted); font-size: .88rem; }
+
+    .source-list {
+      columns: 2;
+      column-gap: 24px;
+      padding-left: 1.1rem;
+    }
+    .source-list li { break-inside: avoid; margin: 0 0 9px; color: var(--muted); }
+    .footer {
+      margin-top: 46px;
+      color: var(--subtle);
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      font-size: .9rem;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { position: relative; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+      nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; }
+      main { padding: 28px 18px 60px; }
+      .hero { padding: 28px; }
+      .toolbar { grid-template-columns: 1fr; }
+      .section-head { display: block; }
+      .section-head p { text-align: left; margin-top: 8px; }
+      .span-8, .span-7, .span-6, .span-5, .span-4, .span-3 { grid-column: span 12; }
+      .split { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr; }
+      .source-list { columns: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>Codex Mastery<small>field guide · April 2026</small></div>
+      </div>
+      <nav aria-label="Main navigation">
+        <div class="nav-section">Start</div>
+        <a href="#overview"><span class="dot"></span> Mental model</a>
+        <a href="#models"><span class="dot"></span> Models & reasoning</a>
+        <a href="#instructions"><span class="dot"></span> AGENTS.md</a>
+        <a href="#config"><span class="dot"></span> Configuration</a>
+        <a href="#security"><span class="dot"></span> Security & sandbox</a>
+        <a href="#context"><span class="dot"></span> Context & memory</a>
+        <div class="nav-section">Execution</div>
+        <a href="#workflows"><span class="dot"></span> Workflows</a>
+        <a href="#app"><span class="dot"></span> Codex app</a>
+        <a href="#cloud"><span class="dot"></span> Cloud / Web</a>
+        <a href="#skills"><span class="dot"></span> Skills & plugins</a>
+        <a href="#mcp"><span class="dot"></span> MCP & tools</a>
+        <a href="#subagents"><span class="dot"></span> Subagents</a>
+        <div class="nav-section">Ops</div>
+        <a href="#integrations"><span class="dot"></span> Integrations</a>
+        <a href="#patterns"><span class="dot"></span> Patterns</a>
+        <a href="#troubleshooting"><span class="dot"></span> Troubleshooting</a>
+        <a href="#sources"><span class="dot"></span> Sources</a>
+      </nav>
+      <div class="side-note">
+        Built as an original Codex field guide inspired by the structure of the Claude Code Mastery reference. It does not copy that site's wording or CSS.
+      </div>
+    </aside>
+
+    <main>
+      <header class="hero">
+        <span class="eyebrow">OpenAI Codex · field manual</span>
+        <h1>Codex Mastery</h1>
+        <p class="lead">A deeply researched, practical guide to how OpenAI Codex works across CLI, IDE, app, cloud, GitHub, skills, MCP, subagents, memories, sandboxing, and production workflows.</p>
+        <div class="pills">
+          <span class="pill"><strong>Researched:</strong> 26 Apr 2026</span>
+          <span class="pill"><strong>Scope:</strong> modern Codex coding agent</span>
+          <span class="pill"><strong>Surfaces:</strong> CLI · IDE · App · Cloud</span>
+          <span class="pill"><strong>Core loop:</strong> plan → edit → run → review</span>
+          <span class="pill"><strong>Default stance:</strong> trust slowly, verify aggressively</span>
+        </div>
+      </header>
+
+      <div class="toolbar" aria-label="Guide controls">
+        <input id="search" class="search" placeholder="Search this guide: AGENTS, sandbox, skills, cloud, subagents…" />
+        <button id="expandAll" type="button">Expand all</button>
+        <button id="collapseAll" type="button">Collapse all</button>
+      </div>
+
+      <section id="overview" class="section">
+        <div class="section-head">
+          <h2>1. Mental model</h2>
+          <p>Codex is not only “a model that writes code.” It is an agent runtime around a model: instructions, repo context, tool calls, file edits, commands, approvals, and a verification loop.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">01</span>
+              <div class="summary-text"><h3>The useful definition</h3><p>Think “model + harness + permissions + context + feedback,” not chat.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <div class="callout ok"><strong>Core idea:</strong> Codex becomes good when the environment is set up well. Bad outputs often trace back to weak instructions, missing tests, wrong working directory, too much irrelevant context, or permissions that block the verification loop.</div>
+              <div class="flow" aria-label="Codex operating loop">
+                <div class="flow-step"><b>1. Prompt</b><span>You give the goal, constraints, files, and done criteria.</span></div>
+                <div class="flow-step"><b>2. Context</b><span>Codex layers system instructions, AGENTS.md, config, memories, skills, MCP resources, and repo files.</span></div>
+                <div class="flow-step"><b>3. Plan</b><span>The model decides what to inspect, edit, run, or ask permission for.</span></div>
+                <div class="flow-step"><b>4. Act</b><span>It reads files, applies patches, runs commands, uses browser/tools if enabled, and tracks diffs.</span></div>
+                <div class="flow-step"><b>5. Verify</b><span>Tests, linters, typechecks, reviews, PRs, or follow-up prompts close the loop.</span></div>
+              </div>
+              <table>
+                <thead><tr><th>Layer</th><th>What it contributes</th><th>Typical failure mode</th><th>Mastery move</th></tr></thead>
+                <tbody>
+                  <tr><td>Model</td><td>Reasoning, code synthesis, debugging, review judgment.</td><td>Overkill model for simple tasks, weak model for ambiguous architecture work.</td><td>Pick by task shape: small model for bounded/simple; frontier/high reasoning for long-horizon or risky changes.</td></tr>
+                  <tr><td>Client/runtime</td><td>CLI, IDE, app, or cloud execution surface with file/command/browser capabilities.</td><td>Using cloud for local-only context or CLI for long parallel async work.</td><td>Match surface to workflow: local pairing, IDE focus, app orchestration, cloud delegation.</td></tr>
+                  <tr><td>Instructions</td><td>Global and repo rules via AGENTS.md, config, skills, prompts.</td><td>Rules buried in chat history or scattered across docs Codex will not reliably read.</td><td>Put stable, required behavior in AGENTS.md; put repeatable procedures in skills.</td></tr>
+                  <tr><td>Permissions</td><td>Sandbox and approval policy determine what can be done without asking.</td><td>Either too strict to run tests or too permissive for untrusted code.</td><td>Start narrow; allow workspace edits and local tests; escalate deliberately.</td></tr>
+                  <tr><td>Verification</td><td>Tests, lint, typecheck, code review, diff review, PR review.</td><td>Accepting plausible code without running the project’s real checks.</td><td>Make “done when checks pass and diff is reviewed” part of every serious prompt.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">02</span>
+              <div class="summary-text"><h3>Where Codex runs</h3><p>Same agent family, different ergonomics and trust boundaries.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Surface</th><th>Best use</th><th>Strength</th><th>Watch out</th></tr></thead>
+                <tbody>
+                  <tr><td>CLI</td><td>Terminal pairing in a repo.</td><td>Fast local loop, scriptable, transparent commands.</td><td>Context must be pointed at files/paths unless discovered.</td></tr>
+                  <tr><td>IDE extension</td><td>Focused code changes while editing.</td><td>Open files, selections, and diagnostics can be natural context.</td><td>Can over-focus on visible files; mention hidden dependencies.</td></tr>
+                  <tr><td>Codex app</td><td>Multiple threads, worktrees, automations, Git review, browser/computer use.</td><td>Best command center for ongoing projects.</td><td>Background automations need sandbox discipline.</td></tr>
+                  <tr><td>Cloud / Web</td><td>Async delegated tasks in isolated containers.</td><td>Runs in parallel and can produce a diff/PR while you do other work.</td><td>Needs environment setup and cannot infer local uncommitted state.</td></tr>
+                  <tr><td>GitHub / Slack / SDK</td><td>Team workflows and automation.</td><td>Meet developers where work arrives: issues, PRs, CI, chat, pipelines.</td><td>Requires precise scoping and review gates.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">03</span>
+              <div class="summary-text"><h3>The mastery stack</h3><p>What to set up before blaming the model.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ol class="tight-list">
+                <li><strong>Repository instructions:</strong> one clean root <code>AGENTS.md</code>, nested files only where conventions differ.</li>
+                <li><strong>Checks:</strong> document exact install/build/test/lint/typecheck commands, including known failures.</li>
+                <li><strong>Config:</strong> choose model, reasoning effort, sandbox, approvals, MCP servers, memory settings.</li>
+                <li><strong>Skills:</strong> encode repeatable workflows such as “ship a Next.js page,” “triage flaky test,” or “prepare release notes.”</li>
+                <li><strong>Tools:</strong> add MCP only when it supplies high-signal context or deterministic actions.</li>
+                <li><strong>Review:</strong> make Codex review its own diff and then use a separate review pass for meaningful changes.</li>
+              </ol>
+              <div class="callout warn"><strong>Hard truth:</strong> “Make it better” is a weak prompt. “Refactor <code>src/payments</code> to remove duplicate retry logic, preserve public API, add tests for timeout and idempotency, run <code>pnpm test payments</code>, then summarize diff risks” is a usable work order.</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="models" class="section">
+        <div class="section-head">
+          <h2>2. Models & reasoning</h2>
+          <p>The model is a dial, not a status symbol. Match depth to uncertainty, risk, and context length.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">04</span>
+              <div class="summary-text"><h3>Model selection map</h3><p>Use frontier models where errors are expensive; use smaller models for cheap exploration and subagents.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Model</th><th>Use it for</th><th>Avoid it for</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td><code>gpt-5.5</code></td><td>Complex coding, architecture, debugging, computer use, research-heavy workflows.</td><td>Trivial edits where speed matters more than judgment.</td><td>OpenAI docs recommend starting here when it is available in Codex.</td></tr>
+                  <tr><td><code>gpt-5.4</code></td><td>Default fallback when 5.5 is not available; long-horizon application work.</td><td>Ultra-fast low-cost scans.</td><td>Still a strong general coding model.</td></tr>
+                  <tr><td><code>gpt-5.4-mini</code></td><td>Fast exploration, large-file review, documentation, lower-reasoning subagents.</td><td>High-risk migrations or ambiguous product/architecture calls.</td><td>Useful when you want breadth before depth.</td></tr>
+                  <tr><td><code>gpt-5.3-codex</code></td><td>Older Codex-optimized workflows where configured or preserved.</td><td>New frontier tasks when newer models are available.</td><td>Relevant historically and in compatibility contexts.</td></tr>
+                  <tr><td><code>spark</code></td><td>Very fast text-only exploration on supported plans.</td><td>Tasks requiring maximum reasoning, images, or computer use.</td><td>Research-preview style workflow; treat as speed tool, not final authority.</td></tr>
+                </tbody>
+              </table>
+              <div class="callout"><strong>Rule of thumb:</strong> expensive ambiguity deserves expensive reasoning. Cheap certainty deserves cheap execution.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-7">
+            <summary>
+              <span class="num">05</span>
+              <div class="summary-text"><h3>Reasoning effort</h3><p>Reasoning depth should change with the phase of work.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Effort</th><th>Use</th><th>Prompt style</th></tr></thead>
+                <tbody>
+                  <tr><td><code>minimal</code></td><td>Simple commands, formatting, tiny edits.</td><td>Direct imperative with exact target file.</td></tr>
+                  <tr><td><code>low</code></td><td>Known fix, small refactor, documentation pass.</td><td>Give goal and constraints; ask for concise diff summary.</td></tr>
+                  <tr><td><code>medium</code></td><td>Default for normal implementation.</td><td>Goal + context + constraints + done criteria.</td></tr>
+                  <tr><td><code>high</code></td><td>Debugging, migrations, security-sensitive changes, unfamiliar code.</td><td>Ask for plan first, identify assumptions, run checks.</td></tr>
+                  <tr><td><code>xhigh</code></td><td>Deep architecture, root-cause analysis, multi-system failures.</td><td>Split into investigation → plan → implementation → review.</td></tr>
+                </tbody>
+              </table>
+              <pre><code># CLI one-off examples
+codex -m gpt-5.5 -c model_reasoning_effort=high "Find the root cause of the flaky checkout test. Do not patch until you explain the cause."
+
+codex -m gpt-5.4-mini -c model_reasoning_effort=low "Summarize the API surface of src/billing in 20 bullets."</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-5">
+            <summary>
+              <span class="num">06</span>
+              <div class="summary-text"><h3>Model switching pattern</h3><p>Use smaller models for map-making; switch up for judgment and patching.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ol class="tight-list">
+                <li><strong>Explore cheap:</strong> ask a fast model to inventory files, modules, risks, and unknowns.</li>
+                <li><strong>Plan deep:</strong> use a frontier model to decide strategy and failure modes.</li>
+                <li><strong>Patch focused:</strong> keep the implementation scope narrow and testable.</li>
+                <li><strong>Review separate:</strong> run <code>/review</code> or a fresh reviewer thread after the patch.</li>
+              </ol>
+              <div class="callout warn"><strong>Avoid:</strong> leaving a high-reasoning frontier model on while asking for repetitive formatting or doc cleanup. That burns budget without improving quality.</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="instructions" class="section">
+        <div class="section-head">
+          <h2>3. AGENTS.md</h2>
+          <p>AGENTS.md is the repo’s operating manual for coding agents. It is the single highest leverage setup file.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">07</span>
+              <div class="summary-text"><h3>Discovery and precedence</h3><p>Codex combines global and project instructions, then closer project files override earlier ones by appearing later.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Layer</th><th>Typical location</th><th>Role</th><th>Precedence behavior</th></tr></thead>
+                <tbody>
+                  <tr><td>Global override</td><td><code>~/.codex/AGENTS.override.md</code></td><td>Personal hard rules.</td><td>Preferred over the normal global file when present.</td></tr>
+                  <tr><td>Global</td><td><code>~/.codex/AGENTS.md</code></td><td>Your stable preferences across projects.</td><td>Loaded before project docs.</td></tr>
+                  <tr><td>Project root</td><td><code>&lt;repo&gt;/AGENTS.md</code></td><td>Repository-wide conventions.</td><td>Loaded from project/Git root downward.</td></tr>
+                  <tr><td>Nested scope</td><td><code>frontend/AGENTS.md</code>, <code>packages/api/AGENTS.md</code></td><td>Subtree-specific rules.</td><td>Closer files are appended later, so they can override or specialize root rules.</td></tr>
+                </tbody>
+              </table>
+              <div class="callout"><strong>Important:</strong> keep the file short. Codex stops adding project instruction content once the combined budget reaches the configured cap, which defaults to 32 KiB.</div>
+              <pre><code>repo/
+  AGENTS.md                 # global repo rules
+  web/
+    AGENTS.md               # frontend-specific rules
+    src/...
+  api/
+    AGENTS.md               # backend-specific rules
+    src/...
+
+# Starting Codex from repo/web/src loads:
+# global ~/.codex file → repo/AGENTS.md → repo/web/AGENTS.md</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-7">
+            <summary>
+              <span class="num">08</span>
+              <div class="summary-text"><h3>A usable AGENTS.md template</h3><p>Codex does not need prose. It needs operating constraints.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <pre><code># AGENTS.md
+
+## Project map
+- Web app: `apps/web` (Next.js, App Router)
+- API: `apps/api` (FastAPI)
+- Shared types: `packages/contracts`
+
+## Setup
+- Install: `pnpm install`
+- Dev server: `pnpm dev`
+- Typecheck: `pnpm typecheck`
+- Test all: `pnpm test`
+- Test web: `pnpm --filter web test`
+
+## Coding rules
+- Do not introduce new runtime dependencies without explaining why.
+- Prefer small functions and explicit domain names over generic helpers.
+- Keep public API compatibility unless the task asks for a breaking change.
+- Never remove error handling to make tests pass.
+
+## Validation
+Before reporting done, run the narrowest relevant check. If a check cannot run,
+state the exact command attempted and the reason.
+
+## Git and review
+- Do not commit unless explicitly asked.
+- Summarize touched files and risk areas.
+- For non-trivial changes, run a review pass on the diff.</code></pre>
+              <div class="callout warn"><strong>Do not stuff everything here:</strong> detailed procedures belong in skills; temporary task context belongs in the prompt; secret values belong nowhere near agent-readable instructions.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-5">
+            <summary>
+              <span class="num">09</span>
+              <div class="summary-text"><h3>What goes where</h3><p>Use the right memory surface for the job.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Need</th><th>Put it in</th></tr></thead>
+                <tbody>
+                  <tr><td>Permanent repo rules</td><td><code>AGENTS.md</code></td></tr>
+                  <tr><td>Personal style defaults</td><td><code>~/.codex/AGENTS.md</code></td></tr>
+                  <tr><td>Repeatable method</td><td>Skill</td></tr>
+                  <tr><td>Tool / API access</td><td>MCP server or plugin</td></tr>
+                  <tr><td>One-off work order</td><td>Prompt</td></tr>
+                  <tr><td>Emergent user preference</td><td>Memory, where available</td></tr>
+                  <tr><td>Hard security constraint</td><td>Config / sandbox / policy, not just prose</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="config" class="section">
+        <div class="section-head">
+          <h2>4. Configuration</h2>
+          <p>Config turns Codex from a generic assistant into a controlled local engineering system.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">10</span>
+              <div class="summary-text"><h3>Config layers and precedence</h3><p>User, project, profiles, CLI overrides, and trust gates.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Layer</th><th>Example</th><th>Use</th><th>Risk</th></tr></thead>
+                <tbody>
+                  <tr><td>System</td><td><code>/etc/codex/config.toml</code></td><td>Org baseline or managed machine defaults.</td><td>Can surprise local users if undocumented.</td></tr>
+                  <tr><td>User</td><td><code>~/.codex/config.toml</code></td><td>Personal defaults: model, reasoning, sandbox, MCP.</td><td>Too broad if it assumes every repo is trusted.</td></tr>
+                  <tr><td>Project</td><td><code>.codex/config.toml</code></td><td>Repo-specific model, roots, hooks, commands, instructions.</td><td>Ignored until the project is trusted.</td></tr>
+                  <tr><td>Profile</td><td><code>[profiles.deep-review]</code></td><td>Quickly switch between modes.</td><td>Experimental/CLI-focused; avoid relying on it for team-critical behavior.</td></tr>
+                  <tr><td>CLI override</td><td><code>-c key=value</code></td><td>One-off precision.</td><td>Easy to forget what you changed for that run.</td></tr>
+                </tbody>
+              </table>
+              <pre><code># ~/.codex/config.toml — pragmatic local baseline
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+model_reasoning_summary = "concise"
+model_verbosity = "medium"
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = false
+writable_roots = ["/tmp/codex-scratch"]
+
+[features]
+memories = false          # enable only where available and useful
+codex_hooks = false       # turn on when you have deterministic hooks ready
+
+[profiles.deep_review]
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[profiles.fast_scan]
+model = "gpt-5.4-mini"
+model_reasoning_effort = "low"
+sandbox_mode = "read-only"</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">11</span>
+              <div class="summary-text"><h3>Command-line controls</h3><p>Use flags for one-off changes; config for stable defaults.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <pre><code># Start interactive Codex in a repo
+codex
+
+# Start with a prompt
+codex "Explain this codebase and identify the test commands."
+
+# Add another readable directory
+codex --add-dir ../shared-libs
+
+# Set approvals and sandbox for one invocation
+codex -a on-request -c sandbox_mode=workspace-write "Fix the failing auth tests."
+
+# Non-interactive scripting
+codex exec "Run the minimal check for the current diff and summarize failures."</code></pre>
+              <div class="callout danger"><strong>Do not normalize YOLO mode.</strong> <code>danger-full-access</code> plus no approvals is convenient only until untrusted code, a prompt injection, or a mistaken command touches something expensive.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">12</span>
+              <div class="summary-text"><h3>Project config strategy</h3><p>Make the project reproducible before asking Codex to be smart.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ol class="tight-list">
+                <li>Create a root <code>.codex/config.toml</code> only for repo-specific settings.</li>
+                <li>Keep personal preferences in <code>~/.codex/config.toml</code>.</li>
+                <li>Keep project setup and conventions in <code>AGENTS.md</code>.</li>
+                <li>Use project config for safe writable roots, hooks, or project-specific model defaults.</li>
+                <li>Trust the project deliberately; untrusted project config is skipped by design.</li>
+              </ol>
+              <pre><code># .codex/config.toml inside a trusted repo
+model_reasoning_effort = "medium"
+
+[sandbox_workspace_write]
+writable_roots = ["./tmp", "./.cache"]
+network_access = false</code></pre>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="security" class="section">
+        <div class="section-head">
+          <h2>5. Security, sandboxing & approvals</h2>
+          <p>The Codex safety model has two separable parts: what the runtime can technically do, and when it must ask you.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">13</span>
+              <div class="summary-text"><h3>Sandbox mode × approval policy</h3><p>Permissions are engineering controls. Treat them like production deploy permissions.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Control</th><th>Options</th><th>Meaning</th><th>Use</th></tr></thead>
+                <tbody>
+                  <tr><td>Sandbox mode</td><td><code>read-only</code></td><td>Codex can inspect but not modify.</td><td>Audits, codebase understanding, threat modeling.</td></tr>
+                  <tr><td>Sandbox mode</td><td><code>workspace-write</code></td><td>Codex can edit within workspace/writable roots.</td><td>Default for normal local implementation.</td></tr>
+                  <tr><td>Sandbox mode</td><td><code>danger-full-access</code></td><td>Codex can access broadly.</td><td>Rare; trusted repos only; short-lived; understand blast radius.</td></tr>
+                  <tr><td>Approval policy</td><td><code>untrusted</code></td><td>More prompts; cautious mode.</td><td>New repos or code you do not trust.</td></tr>
+                  <tr><td>Approval policy</td><td><code>on-request</code></td><td>Codex asks when it needs powers outside the baseline.</td><td>Good default for productive local work.</td></tr>
+                  <tr><td>Approval policy</td><td><code>never</code></td><td>No human confirmation prompts.</td><td>Only with tight sandboxing and known-safe automation.</td></tr>
+                </tbody>
+              </table>
+              <div class="callout warn"><strong>Network is off by default in many local flows.</strong> That is good. Install dependencies in a controlled setup phase, or grant network only for the commands and environment that need it.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">14</span>
+              <div class="summary-text"><h3>Cloud security model</h3><p>Cloud tasks run in isolated containers with a two-phase lifecycle.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ol class="tight-list">
+                <li><strong>Container:</strong> Codex creates an isolated environment and checks out the repo at the selected branch or commit.</li>
+                <li><strong>Setup phase:</strong> dependencies and setup scripts run; network and secrets can be used depending on environment configuration.</li>
+                <li><strong>Agent phase:</strong> Codex edits/runs checks; internet is off by default unless enabled for that environment.</li>
+                <li><strong>Finish:</strong> it returns answer, diff, logs, and can create a PR or continue follow-up work.</li>
+              </ol>
+              <div class="callout"><strong>Secret handling:</strong> secrets are intended for setup, not agent reasoning. Design setup scripts so the agent can run checks without seeing secrets.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">15</span>
+              <div class="summary-text"><h3>Prompt injection posture</h3><p>Every external page, README, issue, log, and dependency script can try to steer the agent.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ul class="tight-list">
+                <li>Treat browser/page content as untrusted instructions.</li>
+                <li>Do not paste secrets into prompts, browser pages, or screenshots.</li>
+                <li>Use read-only mode for unknown repos and security review.</li>
+                <li>Prefer allowlisted commands for automation.</li>
+                <li>Ask Codex to quote evidence paths and command output for risky claims.</li>
+                <li>Manually review and validate agent-generated code before integration.</li>
+              </ul>
+              <pre><code># Safer prompt for untrusted code
+Audit this repo in read-only mode. Do not run install scripts or network commands.
+Find risky scripts, secrets handling, and suspicious postinstall behavior.
+Report evidence with file paths and exact lines where possible.</code></pre>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="context" class="section">
+        <div class="section-head">
+          <h2>6. Context, memory & compaction</h2>
+          <p>Context is a scarce working set. Feed Codex what matters and keep mandatory rules out of volatile chat history.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-7" open>
+            <summary>
+              <span class="num">16</span>
+              <div class="summary-text"><h3>Context control</h3><p>Good agents are context engineers. Codex will search, but you should still point.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Input</th><th>Use</th><th>Practice</th></tr></thead>
+                <tbody>
+                  <tr><td>File/path mentions</td><td>Direct Codex to relevant code.</td><td>Use <code>@</code> file autocomplete or explicit paths.</td></tr>
+                  <tr><td>Open IDE files</td><td>Fast context for local edits.</td><td>Mention hidden callers/tests not open in editor.</td></tr>
+                  <tr><td>Images/screenshots</td><td>UI bugs, diagrams, error screens.</td><td>Pair image with expected behavior and target files.</td></tr>
+                  <tr><td>AGENTS.md</td><td>Stable project expectations.</td><td>Short, scoped, concrete.</td></tr>
+                  <tr><td>MCP resources</td><td>External docs, databases, design systems, issue trackers.</td><td>Add only high-signal servers; too many tools dilute context.</td></tr>
+                  <tr><td>Skills</td><td>Repeatable procedures.</td><td>Use progressive disclosure: short description first, full file only when needed.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details class="guide-card span-5" open>
+            <summary>
+              <span class="num">17</span>
+              <div class="summary-text"><h3>Memories</h3><p>Useful for preferences; wrong place for hard requirements.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <p class="muted">Memories are opt-in where available, stored under Codex home, and are generated from eligible prior threads. They are useful for recurring preferences and project habits, but not for rules that must be followed every time.</p>
+              <div class="callout warn"><strong>Availability caveat:</strong> OpenAI docs note regional/platform limitations for memories and related screen-context features. In the EEA/UK/Switzerland, treat memory availability as something to verify before designing a workflow around it.</div>
+              <pre><code># Config shape
+[features]
+memories = true
+
+# Thread controls
+/memories</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-12">
+            <summary>
+              <span class="num">18</span>
+              <div class="summary-text"><h3>When threads get long</h3><p>Long context improves continuity until it starts hiding the current task.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <div class="split">
+                <div class="mini-card"><h4>Use one thread when…</h4><p>The task is a coherent unit, previous decisions matter, and the diff is still manageable.</p></div>
+                <div class="mini-card"><h4>Fork or start fresh when…</h4><p>The old thread contains abandoned plans, stale assumptions, or unrelated exploration.</p></div>
+              </div>
+              <pre><code># Context reset prompt
+We are starting a fresh implementation pass.
+Use only these decisions from the prior thread:
+1. ...
+2. ...
+Ignore abandoned approaches A and B.
+Now implement the plan in @docs/PLAN.md and run the checks listed there.</code></pre>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="workflows" class="section">
+        <div class="section-head">
+          <h2>7. Workflows</h2>
+          <p>Codex performs best when you treat it like an engineering teammate with a crisp ticket and a review gate.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">19</span>
+              <div class="summary-text"><h3>The prompt formula</h3><p>Goal, context, constraints, done criteria. Use it until it becomes muscle memory.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <pre><code>Goal:
+  Fix the checkout retry bug where duplicate payment attempts are created after timeout.
+
+Context:
+  Relevant files: @apps/api/src/payments, @packages/contracts/src/payment.ts
+  Failing test/log: paste or attach here.
+
+Constraints:
+  Preserve public API. Do not add dependencies. Do not change database schema.
+  Prefer a minimal patch over architectural cleanup.
+
+Done when:
+  - Root cause explained.
+  - Regression test added.
+  - `pnpm --filter api test payments` passes.
+  - Diff summary includes risk areas and rollback notes.</code></pre>
+              <div class="callout ok"><strong>For hard tasks:</strong> first ask for a plan. Then let Codex implement only after you accept the plan. This prevents the common “plausible but sprawling patch” failure.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">20</span>
+              <div class="summary-text"><h3>Implementation loop</h3><p>Use Codex as a patch generator plus test runner, not as a magic final authority.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ol class="tight-list">
+                <li><strong>Inspect:</strong> ask it to find relevant files, tests, and current behavior.</li>
+                <li><strong>Plan:</strong> require a short plan and risk list before edits.</li>
+                <li><strong>Patch:</strong> keep edits narrow and visible in the diff.</li>
+                <li><strong>Test:</strong> run the smallest relevant command, then broader checks.</li>
+                <li><strong>Review:</strong> run <code>/review</code> or a new reviewer pass.</li>
+                <li><strong>Summarize:</strong> changed files, commands run, failures, risks, next steps.</li>
+              </ol>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">21</span>
+              <div class="summary-text"><h3>Review workflow</h3><p>Separate “builder” and “critic” roles.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <pre><code># Builder prompt
+Implement the accepted plan. Keep the diff minimal. Run the specified checks.
+
+# Reviewer prompt or /review custom instructions
+Review this diff as a senior maintainer. Focus on:
+- correctness and edge cases
+- changed public behavior
+- test coverage gaps
+- security and data integrity risks
+- unnecessary complexity
+Do not suggest style churn unless it hides a real issue.</code></pre>
+              <div class="callout"><strong>Practical test:</strong> if Codex cannot explain what changed and why the checks are sufficient, the task is not done.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-12">
+            <summary>
+              <span class="num">22</span>
+              <div class="summary-text"><h3>Workflow recipes</h3><p>Reusable task shapes that work well with Codex.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Task</th><th>Prompt shape</th><th>Surface</th><th>Extra check</th></tr></thead>
+                <tbody>
+                  <tr><td>Explain codebase</td><td>“Map the architecture, entry points, data flow, and test commands. No edits.”</td><td>CLI/IDE/app</td><td>Ask for evidence paths.</td></tr>
+                  <tr><td>Fix CI failure</td><td>“Read failing logs, reproduce locally if possible, patch minimal cause, rerun exact check.”</td><td>CLI/cloud</td><td>Compare before/after failure output.</td></tr>
+                  <tr><td>Refactor module</td><td>“Plan first, preserve API, add characterization tests, then refactor.”</td><td>CLI/app</td><td>Run tests before and after.</td></tr>
+                  <tr><td>UI bug</td><td>“Use screenshot/browser, inspect component, fix visual behavior, verify in browser.”</td><td>App/IDE</td><td>Attach screenshot or browser observation.</td></tr>
+                  <tr><td>Security review</td><td>“Read-only audit; no install scripts; cite files and exploit path.”</td><td>CLI/cloud read-only</td><td>Separate likelihood from impact.</td></tr>
+                  <tr><td>Migration</td><td>“Inventory usage, write migration plan, patch in phases, test each phase.”</td><td>App/worktrees</td><td>Use subagents for inventory; main agent owns final diff.</td></tr>
+                  <tr><td>Release notes</td><td>“Summarize commits since tag, group by user impact, flag breaking changes.”</td><td>Automation/cloud</td><td>Human approve before publishing.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="app" class="section">
+        <div class="section-head">
+          <h2>8. Codex app</h2>
+          <p>The desktop app is the orchestration layer: parallel threads, worktrees, automations, Git review, local environments, browser use, and computer use.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-6" open>
+            <summary>
+              <span class="num">23</span>
+              <div class="summary-text"><h3>Worktrees</h3><p>Parallelism without wrecking your main checkout.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <p class="muted">Worktrees are separate checkouts backed by the same Git repository metadata. They let Codex work on separate branches/tasks while your local checkout stays clean.</p>
+              <table>
+                <thead><tr><th>Mode</th><th>Use</th><th>Risk</th></tr></thead>
+                <tbody>
+                  <tr><td>Local</td><td>Pairing on the code you are actively editing.</td><td>Codex can modify files you have open.</td></tr>
+                  <tr><td>Worktree</td><td>Parallel task, experiment, or automation.</td><td>Merge conflicts and stale branch context.</td></tr>
+                  <tr><td>Handoff</td><td>Move a thread between local and worktree.</td><td>Review Git state before and after.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details class="guide-card span-6" open>
+            <summary>
+              <span class="num">24</span>
+              <div class="summary-text"><h3>Automations</h3><p>Schedule repeatable checks; do not automate chaos.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ul class="tight-list">
+                <li>Good: summarize recent commits every morning.</li>
+                <li>Good: scan for likely bugs after dependency updates.</li>
+                <li>Good: draft weekly release notes from merged PRs.</li>
+                <li>Good: check CI failures and propose likely fixes.</li>
+                <li>Bad: background full-access agent on untrusted repos.</li>
+                <li>Bad: vague recurring prompt with no acceptance criteria.</li>
+              </ul>
+              <div class="callout"><strong>Useful distinction:</strong> skills define the method; automations define the schedule.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-12">
+            <summary>
+              <span class="num">25</span>
+              <div class="summary-text"><h3>Browser and computer use</h3><p>Powerful for UI workflows, but treat external content as hostile.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Feature</th><th>Use</th><th>Limitations / cautions</th></tr></thead>
+                <tbody>
+                  <tr><td>In-app browser</td><td>Preview local dev servers, file-backed pages, public pages, UI bugs.</td><td>No normal authenticated browser profile; do not paste secrets; external content is untrusted.</td></tr>
+                  <tr><td>Browser use</td><td>Let Codex interact with pages after permission.</td><td>Ask for scoped tasks and verify actions.</td></tr>
+                  <tr><td>Computer use</td><td>Operate GUI apps where APIs are absent.</td><td>Platform and regional availability varies; permission prompts matter; review before destructive actions.</td></tr>
+                  <tr><td>Windows app</td><td>Native PowerShell sandbox or WSL2 workflows.</td><td>Make sure sandbox mode matches the execution environment.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="cloud" class="section">
+        <div class="section-head">
+          <h2>9. Cloud / Web Codex</h2>
+          <p>Cloud Codex is best for well-scoped delegated work where the repository can be built inside an OpenAI-managed container.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-7" open>
+            <summary>
+              <span class="num">26</span>
+              <div class="summary-text"><h3>Environment lifecycle</h3><p>Cloud quality is mostly environment quality.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ol class="tight-list">
+                <li>Connect/select repository and branch/SHA.</li>
+                <li>Container starts from a default or custom image.</li>
+                <li>Setup script installs dependencies and prepares caches.</li>
+                <li>Secrets are available to setup if configured, then removed before agent work.</li>
+                <li>Agent reads instructions, edits files, runs checks, and produces a diff.</li>
+                <li>You review the result, ask follow-ups, or create/continue a PR.</li>
+              </ol>
+              <pre><code># Cloud CLI examples
+codex cloud "Investigate failing CI on the payments branch and propose a fix."
+
+codex cloud exec --env production-like "Run the backend tests and explain failures."
+
+# Best-of-N cloud attempts for hard tasks
+codex cloud exec --attempts 3 "Find three independent fixes for the flaky onboarding test."</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-5" open>
+            <summary>
+              <span class="num">27</span>
+              <div class="summary-text"><h3>Use cloud when…</h3><p>Async, isolated, repeatable, reviewable.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ul class="tight-list">
+                <li>The task can be defined from repo state, issue, PR, or branch.</li>
+                <li>Setup can run without your local machine.</li>
+                <li>Checks are documented and can be run in the container.</li>
+                <li>You want multiple attempts or parallel approaches.</li>
+                <li>The result can be reviewed as a diff/PR.</li>
+              </ul>
+              <div class="callout danger"><strong>Do not use cloud as a mind reader:</strong> it cannot know your local uncommitted edits, private terminal state, or undocumented setup hacks unless you explicitly provide or encode them.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-12">
+            <summary>
+              <span class="num">28</span>
+              <div class="summary-text"><h3>Cloud environment checklist</h3><p>Make the container boring before expecting Codex to be brilliant.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Item</th><th>Question</th><th>Fix</th></tr></thead>
+                <tbody>
+                  <tr><td>Dependencies</td><td>Can setup install exact versions?</td><td>Pin runtime versions; use lockfiles; document package manager.</td></tr>
+                  <tr><td>Secrets</td><td>Can checks run without exposing secrets to the agent?</td><td>Use setup-only secrets; create mock/test credentials where possible.</td></tr>
+                  <tr><td>Network</td><td>Does the agent phase need internet?</td><td>Prefer offline agent phase; enable network only when truly needed.</td></tr>
+                  <tr><td>Tests</td><td>Does AGENTS.md list the right commands?</td><td>Add narrow and broad checks with expected runtime.</td></tr>
+                  <tr><td>Cache</td><td>Is setup slow or stale?</td><td>Use cached setup and reset cache after dependency/setup changes.</td></tr>
+                  <tr><td>Image</td><td>Does default image miss system packages?</td><td>Use custom image or setup script to install required tools.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="skills" class="section">
+        <div class="section-head">
+          <h2>10. Skills & plugins</h2>
+          <p>Skills are reusable agent procedures. Plugins are a distribution mechanism. The goal is repeatability, not more text in every prompt.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">29</span>
+              <div class="summary-text"><h3>Skill anatomy</h3><p>Codex sees a small description first, then loads the full skill only when it is relevant.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <pre><code>my-release-notes-skill/
+  SKILL.md
+  scripts/
+    collect_commits.py
+  references/
+    changelog_style.md
+  assets/
+    release-template.md
+  agents/
+    openai.yaml       # optional Codex app metadata / invocation policy</code></pre>
+              <pre><code>---
+name: release-notes
+description: Use when preparing customer-facing release notes from commits, PRs, or changelog drafts.
+---
+
+# Release notes skill
+
+## When to use
+Use this for weekly/monthly release notes, launch notes, or PR-to-release summaries.
+
+## Procedure
+1. Collect commits and PRs for the requested range.
+2. Group by customer-visible impact.
+3. Separate fixes, improvements, breaking changes, and internal-only changes.
+4. Draft notes in the house style from `references/changelog_style.md`.
+5. Flag claims that need product/legal review.</code></pre>
+              <div class="callout"><strong>Trigger design:</strong> the description is the skill’s front door. If it is vague, Codex will not reliably invoke it. Name the exact situations where the skill should fire.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">30</span>
+              <div class="summary-text"><h3>Personal vs team skills</h3><p>Keep private habits private; share procedures that raise team quality.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Scope</th><th>Path</th><th>Use</th></tr></thead>
+                <tbody>
+                  <tr><td>Personal</td><td><code>$HOME/.agents/skills</code></td><td>Your own workflows and preferences.</td></tr>
+                  <tr><td>Team/repo</td><td><code>.agents/skills</code></td><td>Shared procedures for the repository or organization.</td></tr>
+                  <tr><td>Packaged</td><td>Plugin</td><td>Installable, versioned distribution across projects.</td></tr>
+                </tbody>
+              </table>
+              <p class="muted">Start local, iterate, then package or check into the repo when the skill is stable and genuinely useful.</p>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">31</span>
+              <div class="summary-text"><h3>Good skill candidates</h3><p>If you have prompted it three times, it may be a skill.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ul class="tight-list">
+                <li>“Prepare a safe database migration.”</li>
+                <li>“Debug flaky Playwright test.”</li>
+                <li>“Implement design system component from Figma and verify states.”</li>
+                <li>“Write incident postmortem from timeline and logs.”</li>
+                <li>“Review PR for security and data integrity risks.”</li>
+                <li>“Modernize package to new framework version.”</li>
+              </ul>
+              <div class="callout warn"><strong>Not a skill:</strong> project facts that never change. Put those in AGENTS.md or docs.</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="mcp" class="section">
+        <div class="section-head">
+          <h2>11. MCP & external tools</h2>
+          <p>MCP lets Codex reach structured external context and actions. Add it when the tool improves precision; do not add it for novelty.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-7" open>
+            <summary>
+              <span class="num">32</span>
+              <div class="summary-text"><h3>MCP mental model</h3><p>Servers expose tools, resources, and prompts; Codex is the client.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>MCP part</th><th>Meaning</th><th>Examples</th></tr></thead>
+                <tbody>
+                  <tr><td>Tool</td><td>Action Codex can call.</td><td>Create ticket, query DB, fetch docs, run custom analysis.</td></tr>
+                  <tr><td>Resource</td><td>Read-only context.</td><td>Design system docs, API schema, issue metadata.</td></tr>
+                  <tr><td>Prompt</td><td>Reusable prompt/template exposed by server.</td><td>Company review checklist, support triage procedure.</td></tr>
+                  <tr><td>Transport</td><td>How client talks to server.</td><td>STDIO, Streamable HTTP, bearer auth, OAuth.</td></tr>
+                </tbody>
+              </table>
+              <pre><code># Example pattern; adapt to the exact server docs
+codex mcp add context7 -- npx -y @upstash/context7-mcp
+
+# In Codex TUI
+/mcp</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-5" open>
+            <summary>
+              <span class="num">33</span>
+              <div class="summary-text"><h3>MCP selection test</h3><p>Ask these before connecting another server.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ol class="tight-list">
+                <li>Does this server provide context Codex cannot cheaply read from the repo?</li>
+                <li>Are tool actions deterministic enough to trust?</li>
+                <li>Can access be scoped and audited?</li>
+                <li>Will prompts become shorter and more reliable?</li>
+                <li>Does it increase prompt-injection exposure?</li>
+              </ol>
+              <div class="callout danger"><strong>Security move:</strong> do not grant broad write-capable MCP tools to background automations without separate policy checks.</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="subagents" class="section">
+        <div class="section-head">
+          <h2>12. Subagents</h2>
+          <p>Subagents are parallel specialists. They are useful for bounded research and review; dangerous when each tries to edit the same surface.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">34</span>
+              <div class="summary-text"><h3>When to use subagents</h3><p>Use them for independent workstreams, then merge judgment in the main thread.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Good subagent task</th><th>Why it works</th><th>Bad subagent task</th></tr></thead>
+                <tbody>
+                  <tr><td>Inventory all call sites of an API.</td><td>Read-heavy, parallelizable, bounded.</td><td>Each subagent edits call sites independently with no merge plan.</td></tr>
+                  <tr><td>Compare three implementation strategies.</td><td>Produces options and tradeoffs.</td><td>Let three agents ship three incompatible architectures.</td></tr>
+                  <tr><td>Audit tests for coverage gaps.</td><td>Separate critic role avoids builder bias.</td><td>Subagent modifies tests while main agent modifies production code blindly.</td></tr>
+                  <tr><td>Explore unfamiliar modules.</td><td>Keeps noisy exploration out of main context.</td><td>Delegate final decision to a worker without human or main-agent synthesis.</td></tr>
+                </tbody>
+              </table>
+              <pre><code>Use subagents for read-only research. Spawn:
+1. explorer: map payment retry flow and cite files.
+2. reviewer: find data-integrity risks in current implementation.
+3. tester: identify existing tests and missing regression cases.
+
+Return their findings, then synthesize one implementation plan. Do not edit yet.</code></pre>
+              <div class="callout"><strong>Cost reality:</strong> subagents use more tokens than a single-agent pass. Spend them where parallel independent cognition beats linear chat.</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="integrations" class="section">
+        <div class="section-head">
+          <h2>13. Integrations & automation</h2>
+          <p>Codex becomes more valuable when it is wired into existing developer workflows, not when it becomes a side chat.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-6" open>
+            <summary>
+              <span class="num">35</span>
+              <div class="summary-text"><h3>GitHub workflows</h3><p>Issues, PRs, review comments, and CI are natural work queues.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ul class="tight-list">
+                <li>Tag Codex on PRs/issues where supported to request review or changes.</li>
+                <li>Use GitHub-connected cloud tasks for clean branch-based work.</li>
+                <li>Ask for suggested fixes, but require human review before merge.</li>
+                <li>For PR review, ask Codex to separate blocking correctness issues from style preferences.</li>
+              </ul>
+              <pre><code>@codex review this PR for data integrity and auth regressions.
+Focus on changed behavior, missing tests, and security risk.
+Ignore formatting unless it hides a bug.</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-6" open>
+            <summary>
+              <span class="num">36</span>
+              <div class="summary-text"><h3>Scriptable Codex</h3><p>Use non-interactive execution for deterministic checks and reports.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <pre><code># Report-only local check
+codex exec -c sandbox_mode=read-only \
+  "Summarize changed files against main and identify risky areas. No edits."
+
+# Controlled implementation script
+codex exec -a on-request -c sandbox_mode=workspace-write \
+  "Fix the failing unit test shown in logs/test-failure.txt. Run only pnpm test unit."</code></pre>
+              <div class="callout warn"><strong>CI caution:</strong> agentic edits in CI need explicit branch, artifact, and review handling. Do not let a bot silently rewrite production code without a PR gate.</div>
+            </div>
+          </details>
+
+          <details class="guide-card span-12">
+            <summary>
+              <span class="num">37</span>
+              <div class="summary-text"><h3>Operating model for teams</h3><p>Decide what humans own, what Codex drafts, and what automation monitors.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Function</th><th>Codex role</th><th>Human role</th><th>Control</th></tr></thead>
+                <tbody>
+                  <tr><td>Feature implementation</td><td>Draft patch, tests, summary.</td><td>Scope, review, product judgment.</td><td>PR review and test gate.</td></tr>
+                  <tr><td>Code review</td><td>Find likely defects and missing tests.</td><td>Prioritize and decide merge.</td><td>Separate reviewer prompt/model.</td></tr>
+                  <tr><td>Maintenance</td><td>Scheduled scans, release notes, dependency triage.</td><td>Approve actions and exceptions.</td><td>Automations + worktrees.</td></tr>
+                  <tr><td>Security</td><td>Read-only audits and fix drafts.</td><td>Threat modeling, acceptance, disclosure.</td><td>Sandbox, no secrets, evidence requirements.</td></tr>
+                  <tr><td>Docs</td><td>Draft based on code and changes.</td><td>Tone, accuracy, customer claims.</td><td>Source-path citations and review.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="patterns" class="section">
+        <div class="section-head">
+          <h2>14. Patterns that compound</h2>
+          <p>These are the boring moves that make Codex consistently useful instead of occasionally impressive.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-4" open>
+            <summary>
+              <span class="num">38</span>
+              <div class="summary-text"><h3>Plan mode first</h3><p>For anything ambiguous, make Codex explain before it edits.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <p class="muted">Use <code>/plan</code> or the app/IDE equivalent before greenfield features, migrations, security fixes, or large refactors. Plans reveal mistaken assumptions before they become code.</p>
+            </div>
+          </details>
+
+          <details class="guide-card span-4" open>
+            <summary>
+              <span class="num">39</span>
+              <div class="summary-text"><h3>Narrow checks</h3><p>Run the smallest relevant check, then broader checks.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <p class="muted">A 90-second targeted test gives faster feedback than a 25-minute full suite. Ask for both when warranted, but sequence them intentionally.</p>
+            </div>
+          </details>
+
+          <details class="guide-card span-4" open>
+            <summary>
+              <span class="num">40</span>
+              <div class="summary-text"><h3>Diff budgets</h3><p>Limit blast radius explicitly.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <p class="muted">Tell Codex which files are in scope, which APIs cannot change, and when to stop and ask. Small diffs are easier to review and safer to merge.</p>
+            </div>
+          </details>
+
+          <details class="guide-card span-4">
+            <summary>
+              <span class="num">41</span>
+              <div class="summary-text"><h3>Evidence prompts</h3><p>Make claims traceable.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <pre><code>For every claim about existing behavior, cite the file path and function/test/log that supports it.</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-4">
+            <summary>
+              <span class="num">42</span>
+              <div class="summary-text"><h3>Retrospective loop</h3><p>Turn repeated failures into setup.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <p class="muted">When Codex repeats a mistake, do not just correct it in chat. Decide whether the fix belongs in AGENTS.md, config, a skill, a test, or a hook.</p>
+            </div>
+          </details>
+
+          <details class="guide-card span-4">
+            <summary>
+              <span class="num">43</span>
+              <div class="summary-text"><h3>Separate exploration from execution</h3><p>Read-only first for unfamiliar systems.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <p class="muted">Let Codex map the territory before it edits. For complex systems, “investigate and propose” is often the highest-value first turn.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="troubleshooting" class="section">
+        <div class="section-head">
+          <h2>15. Troubleshooting</h2>
+          <p>Most Codex failures are not mysterious. Diagnose the layer: context, instructions, permissions, environment, or task shape.</p>
+        </div>
+
+        <div class="grid">
+          <details class="guide-card span-12" open>
+            <summary>
+              <span class="num">44</span>
+              <div class="summary-text"><h3>Symptom → likely cause → fix</h3><p>A fast field diagnostic table.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <table>
+                <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+                <tbody>
+                  <tr><td>Codex ignores project conventions.</td><td>AGENTS.md not found, too large, wrong CWD, or nested override missing.</td><td>Run from repo/subdir intentionally; ask Codex to summarize active instructions; trim AGENTS.md.</td></tr>
+                  <tr><td>Project config not applied.</td><td>Project is untrusted or precedence overridden.</td><td>Trust the project; inspect user/project config; use one-off <code>-c</code> to test.</td></tr>
+                  <tr><td>Cannot edit or write temp files.</td><td>Sandbox blocks path.</td><td>Add a writable root or move output inside workspace; avoid full access unless necessary.</td></tr>
+                  <tr><td>Cannot install/fetch dependencies.</td><td>Network disabled.</td><td>Use setup phase, allowlist network temporarily, or vendor required dependencies.</td></tr>
+                  <tr><td>Cloud task fails before agent starts.</td><td>Bad setup script, missing runtime, stale cache, secret mismatch.</td><td>Reproduce setup commands; pin versions; reset cache after changes.</td></tr>
+                  <tr><td>Memory seems absent.</td><td>Feature disabled, unavailable, not enough eligible idle thread history, or region/platform limit.</td><td>Verify settings and availability; keep required rules in AGENTS.md.</td></tr>
+                  <tr><td>Skills do not trigger.</td><td>Description too vague, skill too broad, or invocation not explicit.</td><td>Improve description; invoke with <code>$skill-name</code> or <code>/skills</code>; keep scope sharp.</td></tr>
+                  <tr><td>Patch sprawls beyond request.</td><td>Prompt lacked constraints or Codex optimized architecture instead of minimal fix.</td><td>Set file/diff/API limits; ask for plan first; stop and restart with narrower scope.</td></tr>
+                  <tr><td>Tests pass but change is risky.</td><td>Tests insufficient; review missing edge cases.</td><td>Run reviewer pass; ask for missing regression tests and behavioral risks.</td></tr>
+                  <tr><td>Automation creates clutter.</td><td>Too many worktrees/runs retained.</td><td>Archive old runs; avoid pinning unless you need the worktree.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">45</span>
+              <div class="summary-text"><h3>Recovery prompts</h3><p>Use these when a thread drifts.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <pre><code># Recover from drift
+Stop editing. Summarize the current diff, the original goal, and every way the diff exceeds scope.
+Then propose a minimal rollback or narrow patch plan. Do not modify files yet.
+
+# Recover from test failure
+Do not guess. Read the failing output, identify the exact failing assertion or stack frame,
+trace it to code, and explain the root cause before patching.
+
+# Recover from config confusion
+List the model, reasoning effort, sandbox mode, approval policy, working directory,
+active AGENTS.md files, and relevant config layers you can infer.</code></pre>
+            </div>
+          </details>
+
+          <details class="guide-card span-6">
+            <summary>
+              <span class="num">46</span>
+              <div class="summary-text"><h3>When to stop Codex</h3><p>Agentic persistence is useful until it becomes thrashing.</p></div>
+              <span class="plus">+</span>
+            </summary>
+            <div class="details-body">
+              <ul class="tight-list">
+                <li>It patches the symptom repeatedly without explaining the cause.</li>
+                <li>It proposes broad rewrites to avoid a small bug.</li>
+                <li>It cannot run or cite the relevant check.</li>
+                <li>It starts changing unrelated files.</li>
+                <li>It treats web/page text as authoritative instructions.</li>
+              </ul>
+              <div class="callout danger"><strong>Intervene early:</strong> cancel, ask for a diff/scope summary, then restart with a tighter prompt or higher reasoning.</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sources" class="section">
+        <div class="section-head">
+          <h2>16. Sources & research base</h2>
+          <p>This guide prioritizes official OpenAI Codex docs, the open-source Codex repository, AGENTS.md public guidance, and the Codex changelog.</p>
+        </div>
+
+        <div class="grid">
+          <div class="card span-12">
+            <h3>Primary sources used</h3>
+            <ul class="source-list">
+              <li><a href="https://developers.openai.com/codex/cli">OpenAI Codex CLI</a></li>
+              <li><a href="https://developers.openai.com/codex/cli/features">Codex CLI features</a></li>
+              <li><a href="https://developers.openai.com/codex/cli/reference">Codex CLI command reference</a></li>
+              <li><a href="https://developers.openai.com/codex/learn/best-practices">Codex best practices</a></li>
+              <li><a href="https://developers.openai.com/codex/guides/agents-md">Custom instructions with AGENTS.md</a></li>
+              <li><a href="https://agents.md/">AGENTS.md public format</a></li>
+              <li><a href="https://developers.openai.com/codex/config-basic">Config basics</a></li>
+              <li><a href="https://developers.openai.com/codex/config-advanced">Advanced configuration</a></li>
+              <li><a href="https://developers.openai.com/codex/config-reference">Configuration reference</a></li>
+              <li><a href="https://developers.openai.com/codex/agent-approvals-security">Agent approvals & security</a></li>
+              <li><a href="https://developers.openai.com/codex/concepts/sandboxing">Sandboxing</a></li>
+              <li><a href="https://developers.openai.com/codex/app">Codex app</a></li>
+              <li><a href="https://developers.openai.com/codex/app/worktrees">Codex app worktrees</a></li>
+              <li><a href="https://developers.openai.com/codex/app/automations">Codex app automations</a></li>
+              <li><a href="https://developers.openai.com/codex/cloud">Codex Cloud / Web docs</a></li>
+              <li><a href="https://developers.openai.com/codex/skills">Agent skills</a></li>
+              <li><a href="https://developers.openai.com/codex/mcp">MCP in Codex</a></li>
+              <li><a href="https://developers.openai.com/codex/subagents">Subagents</a></li>
+              <li><a href="https://developers.openai.com/codex/memories">Codex memories</a></li>
+              <li><a href="https://developers.openai.com/codex/changelog">Codex changelog</a></li>
+              <li><a href="https://github.com/openai/codex">openai/codex GitHub repository</a></li>
+              <li><a href="https://openai.com/index/introducing-codex/">Introducing Codex</a></li>
+            </ul>
+            <div class="callout warn"><strong>Scope note:</strong> this is a practical guide, not a reverse-engineering claim. Where OpenAI documents behavior, the guide states it. Where internals are not public, the guide uses safe operational mental models rather than pretending to know hidden implementation details.</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        <p><strong>Codex Mastery</strong> · static single-page field guide · researched and generated 26 Apr 2026. Review official docs for pricing, plan availability, regional restrictions, and version-specific behavior before making procurement or security decisions.</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const details = Array.from(document.querySelectorAll('details.guide-card'));
+    const cards = Array.from(document.querySelectorAll('.guide-card, .card'));
+    const search = document.querySelector('#search');
+    const expandAll = document.querySelector('#expandAll');
+    const collapseAll = document.querySelector('#collapseAll');
+
+    expandAll.addEventListener('click', () => details.forEach(d => d.open = true));
+    collapseAll.addEventListener('click', () => details.forEach(d => d.open = false));
+
+    search.addEventListener('input', (event) => {
+      const q = event.target.value.trim().toLowerCase();
+      cards.forEach(card => {
+        const hit = !q || card.textContent.toLowerCase().includes(q);
+        card.hidden = !hit;
+        if (hit && q && card.tagName.toLowerCase() === 'details') card.open = true;
+      });
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', () => {
+        if (window.innerWidth < 980) return;
+        const id = anchor.getAttribute('href').slice(1);
+        const section = document.getElementById(id);
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  </script>
+</body>
+</html>
