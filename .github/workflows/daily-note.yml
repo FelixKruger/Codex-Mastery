@@ -1,0 +1,100 @@
+name: Daily Codex Mastery Note
+
+on:
+  schedule:
+    - cron: '0 8 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  daily-note:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git
+        run: |
+          git config user.name "FelixKruger"
+          git config user.email "Felixerxox@gmail.com"
+
+      - name: Add daily note
+        run: |
+          DATE=$(date -u +"%Y-%m-%d")
+          DAY_NUM=$(date -u +"%j" | sed 's/^0*//')
+          TIPS=(
+            "Tip: Use AGENTS.md at repo root to give Codex persistent project context."
+            "Tip: Prefer small focused prompts over large monolithic ones for better Codex output."
+            "Tip: Pin verification commands in AGENTS.md so Codex auto-checks its own work."
+            "Tip: Use codex --model o4-mini for faster iteration on small tasks."
+            "Tip: Structure repos with clear boundaries - Codex works better with modular code."
+            "Tip: Add a .codex/ directory for prompt templates you reuse across sessions."
+            "Tip: Use sandbox mode for untrusted repos to limit blast radius."
+            "Tip: Chain Codex tasks - generate code then ask it to write tests for what it wrote."
+            "Tip: Keep AGENTS.md under 500 lines - Codex reads it every session."
+            "Tip: Use suggest mode for learning and full-auto mode for tasks you can verify fast."
+            "Tip: Codex respects .gitignore - keep generated files out of its context."
+            "Tip: Run codex with full-auto approval only on repos with good test coverage."
+            "Tip: Use subagents for parallelizable tasks like multi-file refactors."
+            "Tip: Memory files persist context across sessions - use them for project decisions."
+            "Tip: Codex works best when you give it a failing test and ask it to make it pass."
+            "Tip: Set CLAUDE_MODEL env var to switch default models without CLI flags."
+            "Tip: Use MCP servers to give Codex access to external tools and data sources."
+            "Tip: Codex can read images - screenshot UIs and ask it to implement what it sees."
+            "Tip: Use codex -p for one-shot prompts that do not need interactive mode."
+            "Tip: Skills are reusable prompt templates - invest in building yours for repeated workflows."
+            "Tip: Use context compaction settings to handle large repos without token overflow."
+            "Tip: Codex hooks automate checks on every action like pre-commit and post-push."
+            "Tip: Plan mode lets Codex reason before acting - use it for architecture decisions."
+            "Tip: Keep commit messages descriptive - Codex uses git history as context."
+            "Refinement: Break build-me-an-app into discrete steps - Codex excels at bounded tasks."
+            "Refinement: Review Codex diffs before merging - trust but verify."
+            "Refinement: Use codex to write its own AGENTS.md after exploring a new codebase."
+            "Refinement: Pair Codex with CI - auto-reject PRs where tests fail."
+            "Refinement: Use GitHub Actions plus Codex for automated code review on PRs."
+            "Observation: Codex performs better on typed languages like TS and Rust than dynamic ones."
+            "Observation: Explicit error handling instructions reduce hallucinated try-catches."
+            "Observation: Giving Codex example output format dramatically improves structured responses."
+            "Observation: Smaller files get better edits - split large files before asking Codex to refactor."
+            "Pattern: Write the test first then ask Codex to implement - TDD works great here."
+            "Pattern: Use Codex to scaffold then manually refine - faster than writing from scratch."
+            "Pattern: Ask Codex to explain code before modifying it - catches wrong assumptions early."
+            "Pattern: Run Codex in a fresh branch and review the PR - cleanest workflow."
+            "Pattern: Use Codex for migrations - it handles repetitive transform-every-file tasks well."
+            "Workflow: Daily standup with Codex - ask it what changed in the repo overnight."
+            "Workflow: Use Codex to generate changelogs from git history before releases."
+            "Workflow: Ask Codex to audit dependencies for security issues periodically."
+            "Workflow: Use Codex to convert TODO comments into tracked GitHub issues."
+            "Workflow: Let Codex draft API docs from your route handlers."
+            "Note: Cloud Codex can run longer tasks asynchronously."
+            "Note: Codex respects .env files but never commits them - good default behavior."
+            "Note: Max context window varies by model - o4-mini is smaller but faster."
+            "Note: Codex can install npm and pip packages in sandbox - no manual setup needed."
+            "Note: Multiple AGENTS.md files can exist in subdirectories for scoped instructions."
+            "Insight: The best Codex prompt is often just a well-written GitHub issue."
+            "Insight: Codex works better when the repo has a README - it reads project intent from it."
+            "Insight: Treating Codex like a junior dev with clear specs beats treating it like magic."
+          )
+          INDEX=$((DAY_NUM % ${#TIPS[@]}))
+          TIP="${TIPS[$INDEX]}"
+          if [ ! -f daily-notes.md ]; then
+            echo "# Codex Mastery - Daily Notes" > daily-notes.md
+            echo "" >> daily-notes.md
+            echo "Auto-generated tips and refinements for mastering OpenAI Codex." >> daily-notes.md
+            echo "" >> daily-notes.md
+          fi
+          echo "### $DATE" >> daily-notes.md
+          echo "$TIP" >> daily-notes.md
+          echo "" >> daily-notes.md
+
+      - name: Commit and push
+        run: |
+          git add daily-notes.md
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          DATE=$(date -u +"%Y-%m-%d")
+          git commit -m "daily: codex mastery note for $DATE"
+          git push
